@@ -1,0 +1,953 @@
+/**
+ * ============================================================
+ *  Água: Uso ou Abuso? — script.js
+ *  Jogo Educacional | SEDUC-SP / URE Mogi Mirim
+ *  Currículo Paulista — Uso e preservação dos recursos hídricos
+ * ============================================================
+ */
+
+/* ────────────────────────────────────────────────────────────
+   BANCO DE PERGUNTAS
+   Cada pergunta: { texto, opcoes: [{letra, texto}], correta, nivel }
+   As opcoes serão embaralhadas a cada rodada.
+──────────────────────────────────────────────────────────── */
+const PERGUNTAS_BASE = [
+  // ── NÍVEL FÁCIL ────────────────────────────────────────
+  {
+    nivel: 'fácil',
+    texto: 'O que é água virtual?',
+    opcoes: [
+      { letra: 'A', texto: 'Água engarrafada' },
+      { letra: 'B', texto: 'Água usada na produção de bens' },
+      { letra: 'C', texto: 'Água da chuva' },
+      { letra: 'D', texto: 'Água subterrânea' },
+    ],
+    correta: 'B',
+  },
+  {
+    nivel: 'fácil',
+    texto: 'Qual exemplo é uso direto da água?',
+    opcoes: [
+      { letra: 'A', texto: 'Navegação' },
+      { letra: 'B', texto: 'Pesca' },
+      { letra: 'C', texto: 'Banho' },
+      { letra: 'D', texto: 'Turismo' },
+    ],
+    correta: 'C',
+  },
+  {
+    nivel: 'fácil',
+    texto: 'Qual exemplo é uso indireto da água?',
+    opcoes: [
+      { letra: 'A', texto: 'Irrigação' },
+      { letra: 'B', texto: 'Navegação' },
+      { letra: 'C', texto: 'Mineração' },
+      { letra: 'D', texto: 'Indústria' },
+    ],
+    correta: 'B',
+  },
+  {
+    nivel: 'fácil',
+    texto: 'Qual setor mais usa água no Brasil?',
+    opcoes: [
+      { letra: 'A', texto: 'Turismo' },
+      { letra: 'B', texto: 'Comércio' },
+      { letra: 'C', texto: 'Agropecuária' },
+      { letra: 'D', texto: 'Transporte' },
+    ],
+    correta: 'C',
+  },
+  {
+    nivel: 'fácil',
+    texto: 'O abastecimento humano é uso:',
+    opcoes: [
+      { letra: 'A', texto: 'Direto' },
+      { letra: 'B', texto: 'Indireto' },
+      { letra: 'C', texto: 'Recreativo' },
+      { letra: 'D', texto: 'Comercial' },
+    ],
+    correta: 'A',
+  },
+  {
+    nivel: 'fácil',
+    texto: 'A pesca é um uso:',
+    opcoes: [
+      { letra: 'A', texto: 'Direto' },
+      { letra: 'B', texto: 'Industrial' },
+      { letra: 'C', texto: 'Indireto' },
+      { letra: 'D', texto: 'Doméstico' },
+    ],
+    correta: 'C',
+  },
+  {
+    nivel: 'fácil',
+    texto: 'A irrigação utiliza água de forma:',
+    opcoes: [
+      { letra: 'A', texto: 'Indireta' },
+      { letra: 'B', texto: 'Direta' },
+      { letra: 'C', texto: 'Recreativa' },
+      { letra: 'D', texto: 'Turística' },
+    ],
+    correta: 'B',
+  },
+
+  // ── NÍVEL MÉDIO ────────────────────────────────────────
+  {
+    nivel: 'médio',
+    texto: 'Qual atividade gera energia sem consumir água?',
+    opcoes: [
+      { letra: 'A', texto: 'Irrigação' },
+      { letra: 'B', texto: 'Hidrelétrica' },
+      { letra: 'C', texto: 'Mineração' },
+      { letra: 'D', texto: 'Pecuária' },
+    ],
+    correta: 'B',
+  },
+  {
+    nivel: 'médio',
+    texto: 'O uso consuntivo corresponde ao uso:',
+    opcoes: [
+      { letra: 'A', texto: 'Indireto' },
+      { letra: 'B', texto: 'Direto' },
+      { letra: 'C', texto: 'Turístico' },
+      { letra: 'D', texto: 'Pesqueiro' },
+    ],
+    correta: 'B',
+  },
+  {
+    nivel: 'médio',
+    texto: 'Qual atividade depende da água para transporte?',
+    opcoes: [
+      { letra: 'A', texto: 'Irrigação' },
+      { letra: 'B', texto: 'Navegação' },
+      { letra: 'C', texto: 'Pecuária' },
+      { letra: 'D', texto: 'Mineração' },
+    ],
+    correta: 'B',
+  },
+  {
+    nivel: 'médio',
+    texto: 'O desperdício de água afeta principalmente:',
+    opcoes: [
+      { letra: 'A', texto: 'O acesso ao recurso' },
+      { letra: 'B', texto: 'O comércio' },
+      { letra: 'C', texto: 'O turismo' },
+      { letra: 'D', texto: 'A pesca' },
+    ],
+    correta: 'A',
+  },
+  {
+    nivel: 'médio',
+    texto: 'Qual atividade é uso indireto da água?',
+    opcoes: [
+      { letra: 'A', texto: 'Indústria' },
+      { letra: 'B', texto: 'Abastecimento animal' },
+      { letra: 'C', texto: 'Navegação' },
+      { letra: 'D', texto: 'Irrigação' },
+    ],
+    correta: 'C',
+  },
+  {
+    nivel: 'médio',
+    texto: 'A água virtual está presente em:',
+    opcoes: [
+      { letra: 'A', texto: 'Produtos e alimentos' },
+      { letra: 'B', texto: 'Apenas rios' },
+      { letra: 'C', texto: 'Apenas lagos' },
+      { letra: 'D', texto: 'Apenas chuvas' },
+    ],
+    correta: 'A',
+  },
+  {
+    nivel: 'médio',
+    texto: 'Qual uso não retira água do ambiente?',
+    opcoes: [
+      { letra: 'A', texto: 'Irrigação' },
+      { letra: 'B', texto: 'Indústria' },
+      { letra: 'C', texto: 'Navegação' },
+      { letra: 'D', texto: 'Mineração' },
+    ],
+    correta: 'C',
+  },
+
+  // ── NÍVEL DIFÍCIL ──────────────────────────────────────
+  {
+    nivel: 'difícil',
+    texto: 'Por que a carne tem alta água virtual?',
+    opcoes: [
+      { letra: 'A', texto: 'Cresce na água' },
+      { letra: 'B', texto: 'Tem poucas etapas' },
+      { letra: 'C', texto: 'Exige muitos processos produtivos' },
+      { letra: 'D', texto: 'Não usa recursos naturais' },
+    ],
+    correta: 'C',
+  },
+  {
+    nivel: 'difícil',
+    texto: 'Qual uso devolve água após a atividade?',
+    opcoes: [
+      { letra: 'A', texto: 'Hidrelétrica' },
+      { letra: 'B', texto: 'Irrigação' },
+      { letra: 'C', texto: 'Pecuária' },
+      { letra: 'D', texto: 'Abastecimento urbano' },
+    ],
+    correta: 'A',
+  },
+  {
+    nivel: 'difícil',
+    texto: 'O que diferencia uso direto do indireto?',
+    opcoes: [
+      { letra: 'A', texto: 'Local da atividade' },
+      { letra: 'B', texto: 'Volume captado' },
+      { letra: 'C', texto: 'Consumo da água na atividade' },
+      { letra: 'D', texto: 'Tipo de equipamento' },
+    ],
+    correta: 'C',
+  },
+  {
+    nivel: 'difícil',
+    texto: 'Qual atividade combina água e geração elétrica?',
+    opcoes: [
+      { letra: 'A', texto: 'Navegação' },
+      { letra: 'B', texto: 'Hidrelétrica' },
+      { letra: 'C', texto: 'Pesca' },
+      { letra: 'D', texto: 'Turismo' },
+    ],
+    correta: 'B',
+  },
+  {
+    nivel: 'difícil',
+    texto: 'Menor desperdício ocorre quando a água:',
+    opcoes: [
+      { letra: 'A', texto: 'Não retorna ao ambiente' },
+      { letra: 'B', texto: 'É consumida totalmente' },
+      { letra: 'C', texto: 'Retorna após o uso' },
+      { letra: 'D', texto: 'É armazenada em tanques' },
+    ],
+    correta: 'C',
+  },
+  {
+    nivel: 'difícil',
+    texto: 'Por que reduzir desperdícios de água?',
+    opcoes: [
+      { letra: 'A', texto: 'Preserva a disponibilidade do recurso' },
+      { letra: 'B', texto: 'Aumenta o consumo' },
+      { letra: 'C', texto: 'Favorece a poluição' },
+      { letra: 'D', texto: 'Reduz a navegação' },
+    ],
+    correta: 'A',
+  },
+];
+
+/* ── PERGUNTAS SUPER GOTA ─────────────────────────────────── */
+const SUPER_GOTA_BASE = [
+  {
+    texto: 'Qual ação reduz mais a pressão sobre os recursos hídricos?',
+    opcoes: [
+      { letra: 'A', texto: 'Fechar a torneira ao escovar os dentes' },
+      { letra: 'B', texto: 'Reduzir o desperdício de alimentos' },
+      { letra: 'C', texto: 'Tomar banho mais rápido' },
+      { letra: 'D', texto: 'Lavar o carro menos vezes' },
+    ],
+    correta: 'B',
+  },
+  {
+    texto: 'O que a água virtual revela sobre um produto?',
+    opcoes: [
+      { letra: 'A', texto: 'Seu tamanho' },
+      { letra: 'B', texto: 'Seu preço' },
+      { letra: 'C', texto: 'A água usada para produzi-lo' },
+      { letra: 'D', texto: 'A quantidade de água que ele contém' },
+    ],
+    correta: 'C',
+  },
+  {
+    texto: 'Qual atividade seria mais afetada por um rio poluído?',
+    opcoes: [
+      { letra: 'A', texto: 'Hidrelétrica' },
+      { letra: 'B', texto: 'Navegação' },
+      { letra: 'C', texto: 'Pesca' },
+      { letra: 'D', texto: 'Turismo náutico' },
+    ],
+    correta: 'C',
+  },
+  {
+    texto: 'Por que a irrigação é considerada uso direto?',
+    opcoes: [
+      { letra: 'A', texto: 'Utiliza rios para transporte' },
+      { letra: 'B', texto: 'Consome água durante a atividade' },
+      { letra: 'C', texto: 'Produz energia elétrica' },
+      { letra: 'D', texto: 'Mantém a água no mesmo local' },
+    ],
+    correta: 'B',
+  },
+  {
+    texto: 'O que torna a agropecuária grande consumidora de água?',
+    opcoes: [
+      { letra: 'A', texto: 'Uso de hidrovias' },
+      { letra: 'B', texto: 'Geração de energia' },
+      { letra: 'C', texto: 'Irrigação e criação animal' },
+      { letra: 'D', texto: 'Atividades turísticas' },
+    ],
+    correta: 'C',
+  },
+  {
+    texto: 'Qual situação envolve consumo invisível de água?',
+    opcoes: [
+      { letra: 'A', texto: 'Navegar em um rio' },
+      { letra: 'B', texto: 'Comer um hambúrguer' },
+      { letra: 'C', texto: 'Pescar em um lago' },
+      { letra: 'D', texto: 'Andar de barco' },
+    ],
+    correta: 'B',
+  },
+  {
+    texto: 'Qual atividade depende da água sem consumi-la?',
+    opcoes: [
+      { letra: 'A', texto: 'Irrigação' },
+      { letra: 'B', texto: 'Abastecimento urbano' },
+      { letra: 'C', texto: 'Navegação' },
+      { letra: 'D', texto: 'Mineração' },
+    ],
+    correta: 'C',
+  },
+  {
+    texto: 'O que ocorre quando a água retorna poluída ao ambiente?',
+    opcoes: [
+      { letra: 'A', texto: 'O uso continua sem impactos' },
+      { letra: 'B', texto: 'Outros usos podem ser prejudicados' },
+      { letra: 'C', texto: 'A disponibilidade aumenta' },
+      { letra: 'D', texto: 'O desperdício diminui' },
+    ],
+    correta: 'B',
+  },
+  {
+    texto: 'Qual conclusão os dados de água virtual permitem?',
+    opcoes: [
+      { letra: 'A', texto: 'Produtos maiores usam mais água' },
+      { letra: 'B', texto: 'O preço define o consumo de água' },
+      { letra: 'C', texto: 'As etapas produtivas influenciam o consumo' },
+      { letra: 'D', texto: 'Só alimentos usam muita água' },
+    ],
+    correta: 'C',
+  },
+  {
+    texto: 'Qual situação exige relacionar uso direto e indireto?',
+    opcoes: [
+      { letra: 'A', texto: 'Irrigação e pesca no mesmo rio' },
+      { letra: 'B', texto: 'Banho e lavagem de roupa' },
+      { letra: 'C', texto: 'Consumo de água em casa' },
+      { letra: 'D', texto: 'Abastecimento urbano e rural' },
+    ],
+    correta: 'A',
+  },
+];
+
+/* ════════════════════════════════════════════════════════════
+   ESTADO DO JOGO
+════════════════════════════════════════════════════════════ */
+const LIMITE_VENCER = 10;      // Número de avanços para vencer
+const TEMPO_PERGUNTA = 45;     // Segundos por pergunta
+const SUPER_GOTA_INTERVALO = 5; // A cada N rodadas aparece Super Gota
+
+let estado = {
+  pontosAzul:        0,
+  pontosVermelho:    0,
+  posicaoCorda:      0,      // -10 (azul max) a +10 (vermelho max)
+  vezAtual:          'azul', // 'azul' | 'vermelho'
+  perguntaAtual:     null,
+  filaDuperguntas:   [],
+  filaSuperGota:     [],
+  contadorRodada:    0,
+  superGotaAtiva:    false,
+  timer:             null,
+  tempoRestante:     TEMPO_PERGUNTA,
+  respondido:        false,
+  jogoAtivo:         false,
+  usadasNormais:     new Set(),
+  usadasSuperGota:   new Set(),
+};
+
+/* ════════════════════════════════════════════════════════════
+   UTILITÁRIOS
+════════════════════════════════════════════════════════════ */
+
+/** Embaralha array in-place (Fisher-Yates) */
+function embaralhar(arr) {
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr;
+}
+
+/** Copia e embaralha as opções de uma pergunta, mantendo rastreio da correta */
+function embaralharOpcoes(pergunta) {
+  const copia = { ...pergunta, opcoes: [...pergunta.opcoes] };
+  embaralhar(copia.opcoes);
+  return copia;
+}
+
+/** Seleciona próxima pergunta do fila (recarrega se esgotar) */
+function proximaPergunta() {
+  // Verifica se é rodada Super Gota
+  estado.contadorRodada++;
+  if (estado.contadorRodada % SUPER_GOTA_INTERVALO === 0) {
+    return sortearSuperGota();
+  }
+
+  if (estado.filaDuperguntas.length === 0) {
+    // Recarrega e embaralha tudo novamente
+    estado.usadasNormais.clear();
+    estado.filaDuperguntas = embaralhar([...PERGUNTAS_BASE]);
+  }
+  const p = estado.filaDuperguntas.pop();
+  return { ...embaralharOpcoes(p), superGota: false };
+}
+
+function sortearSuperGota() {
+  if (estado.filaSuperGota.length === 0) {
+    estado.usadasSuperGota.clear();
+    estado.filaSuperGota = embaralhar([...SUPER_GOTA_BASE]);
+  }
+  const p = estado.filaSuperGota.pop();
+  return { ...embaralharOpcoes(p), superGota: true };
+}
+
+/* ════════════════════════════════════════════════════════════
+   REFERÊNCIAS DOM
+════════════════════════════════════════════════════════════ */
+const $ = id => document.getElementById(id);
+
+const DOM = {
+  telaInicial:       $('tela-inicial'),
+  telaJogo:          $('tela-jogo'),
+  telaVitoria:       $('tela-vitoria'),
+
+  btnIniciar:        $('btn-iniciar'),
+  btnJogarNovamente: $('btn-jogar-novamente'),
+  btnOkSuperGota:    $('btn-ok-super-gota'),
+
+  modalSuperGota:    $('modal-super-gota'),
+
+  colunaAzul:        $('coluna-azul'),
+  colunaVermelha:    $('coluna-vermelha'),
+
+  // Perguntas e alternativas
+  numAzul:           $('num-azul'),
+  numVermelho:       $('num-vermelho'),
+  txtPergAzul:       $('texto-pergunta-azul'),
+  txtPergVermelho:   $('texto-pergunta-vermelho'),
+  altAzul:           $('alternativas-azul'),
+  altVermelho:       $('alternativas-vermelho'),
+  feedbackAzul:      $('feedback-azul'),
+  feedbackVermelho:  $('feedback-vermelho'),
+
+  // Placar
+  placarAzul:        $('placar-azul'),
+  placarVermelho:    $('placar-vermelho'),
+  pontosAzulDisp:    $('pontos-azul-display'),
+  pontosVermDisp:    $('pontos-vermelho-display'),
+
+  // Cronômetro
+  cronometro:        $('cronometro'),
+  cronBarra:         $('cronometro-barra'),
+
+  // Barras de progresso
+  barraAzul:         $('barra-azul-prog'),
+  barraVermelha:     $('barra-vermelha-prog'),
+
+  // Corda / bandeira
+  bandeira:          $('bandeira'),
+  bandeiraPos:       $('bandeira-pos'),
+
+  // Interface
+  statusRodada:      $('status-rodada'),
+  rodadaNum:         $('rodada-num'),
+  superGotaBadge:    $('super-gota-badge'),
+  vezAzul:           $('vez-azul'),
+  vezVermelho:       $('vez-vermelho'),
+
+  // Vitória
+  vitoriaTitulo:     $('vitoria-titulo'),
+  vitoriaSubtitulo:  $('vitoria-subtitulo'),
+  vitAzul:           $('vit-azul'),
+  vitVermelho:       $('vit-vermelho'),
+  vitoriaMsg:        $('vitoria-msg'),
+  gotasChuva:        $('gotas-chuva'),
+};
+
+/* ════════════════════════════════════════════════════════════
+   GRADIENTES DE BARRA DE PROGRESSO
+   Azul: do mais claro ao mais escuro conforme pontuação sobe
+   Vermelho: idem
+════════════════════════════════════════════════════════════ */
+const GRADIENTES_AZUL = [
+  '#E6F4FF','#B8E1FF','#8ACEFF','#5CBBFF','#2EA8FF',
+  '#0096FF','#007AD1','#005FA3','#004475','#027A47'
+];
+const GRADIENTES_VERMELHO = [
+  '#FFE6E6','#FFB8B8','#FF8A8A','#FF5C5C','#FF2E2E',
+  '#FF0000','#D10000','#A30000','#750000','#470000'
+];
+
+/** Atualiza a barra de tonalidade de cor conforme a pontuação */
+function atualizarBarraProgresso() {
+  const pA = Math.min(estado.pontosAzul, LIMITE_VENCER);
+  const pV = Math.min(estado.pontosVermelho, LIMITE_VENCER);
+
+  const percA = (pA / LIMITE_VENCER) * 100;
+  const percV = (pV / LIMITE_VENCER) * 100;
+
+  // Índice de cor (0-9)
+  const iA = Math.min(pA, 9);
+  const iV = Math.min(pV, 9);
+
+  DOM.barraAzul.style.width = percA + '%';
+  DOM.barraAzul.style.backgroundColor = GRADIENTES_AZUL[iA];
+
+  DOM.barraVermelha.style.width = percV + '%';
+  DOM.barraVermelha.style.backgroundColor = GRADIENTES_VERMELHO[iV];
+}
+
+/* ════════════════════════════════════════════════════════════
+   CRONÔMETRO
+════════════════════════════════════════════════════════════ */
+function iniciarCronometro() {
+  limparCronometro();
+  estado.tempoRestante = TEMPO_PERGUNTA;
+  atualizarDisplayCronometro();
+
+  estado.timer = setInterval(() => {
+    estado.tempoRestante--;
+    atualizarDisplayCronometro();
+
+    if (estado.tempoRestante <= 0) {
+      limparCronometro();
+      timeoutPergunta();
+    }
+  }, 1000);
+}
+
+function limparCronometro() {
+  if (estado.timer) clearInterval(estado.timer);
+  estado.timer = null;
+}
+
+function atualizarDisplayCronometro() {
+  const t = estado.tempoRestante;
+  DOM.cronometro.textContent = t;
+  DOM.cronometro.classList.toggle('urgente', t <= 10);
+
+  // Barra proporcional
+  const perc = (t / TEMPO_PERGUNTA) * 100;
+  DOM.cronBarra.style.width = perc + '%';
+
+  // Muda cor da barra conforme urgência
+  if (t > 20) {
+    DOM.cronBarra.style.background = 'linear-gradient(90deg, #00C9A7, #0096FF)';
+  } else if (t > 10) {
+    DOM.cronBarra.style.background = 'linear-gradient(90deg, #FFD700, #FF8C00)';
+  } else {
+    DOM.cronBarra.style.background = 'linear-gradient(90deg, #FF4444, #CC0000)';
+  }
+}
+
+/** Quando o tempo esgota sem resposta */
+function timeoutPergunta() {
+  if (estado.respondido) return;
+  estado.respondido = true;
+
+  mostrarFeedback(estado.vezAtual, '⏱️ Tempo esgotado!', false);
+
+  // Desativa botões
+  desabilitarAlternativas();
+
+  // Move corda para o adversário (como erro)
+  const adversario = estado.vezAtual === 'azul' ? 'vermelho' : 'azul';
+  const avanco = estado.superGotaAtiva ? 2 : 1;
+  moverCorda(adversario, avanco);
+
+  setTimeout(() => proximaRodada(), 2200);
+}
+
+/* ════════════════════════════════════════════════════════════
+   MOVIMENTAÇÃO DA CORDA
+   posicaoCorda: negativo = favorece azul, positivo = favorece vermelho
+════════════════════════════════════════════════════════════ */
+function moverCorda(equipe, casas = 1) {
+  if (equipe === 'azul') {
+    estado.posicaoCorda -= casas;
+  } else {
+    estado.posicaoCorda += casas;
+  }
+
+  // Clamp
+  estado.posicaoCorda = Math.max(-LIMITE_VENCER, Math.min(LIMITE_VENCER, estado.posicaoCorda));
+
+  renderizarCorda();
+}
+
+function renderizarCorda() {
+  const pos = estado.posicaoCorda;
+  // Transforma posição (-10 a 10) em deslocamento de margem
+  // Bandeira fica no meio; cada ponto move ~8px
+  const deslocamento = pos * 8; // px de deslocamento relativo ao centro
+  DOM.bandeiraPos.style.marginLeft = deslocamento + 'px';
+}
+
+/* ════════════════════════════════════════════════════════════
+   RENDERIZAR PERGUNTA
+════════════════════════════════════════════════════════════ */
+function renderizarPergunta(pergunta) {
+  estado.respondido = false;
+  estado.superGotaAtiva = pergunta.superGota;
+
+  const numRodada = `Rodada ${estado.contadorRodada}`;
+  const nivelLabel = pergunta.superGota ? '💥 Super Gota' : `Nível: ${pergunta.nivel}`;
+
+  // Exibe o mesmo enunciado em ambas colunas
+  DOM.numAzul.textContent = `${numRodada} · ${nivelLabel}`;
+  DOM.numVermelho.textContent = `${numRodada} · ${nivelLabel}`;
+  DOM.txtPergAzul.textContent = pergunta.texto;
+  DOM.txtPergVermelho.textContent = pergunta.texto;
+
+  DOM.rodadaNum.textContent = numRodada;
+
+  // Badge Super Gota
+  if (pergunta.superGota) {
+    DOM.superGotaBadge.classList.remove('hidden');
+  } else {
+    DOM.superGotaBadge.classList.add('hidden');
+  }
+
+  // Limpa feedbacks
+  DOM.feedbackAzul.textContent = '';
+  DOM.feedbackVermelho.textContent = '';
+
+  // Gera botões de alternativas
+  gerarAlternativas(pergunta, 'azul');
+  gerarAlternativas(pergunta, 'vermelho');
+
+  // Atualiza status
+  const nomeVez = estado.vezAtual === 'azul' ? 'Equipe Azul' : 'Equipe Vermelha';
+  DOM.statusRodada.innerHTML = `Vez da <strong>${nomeVez}</strong>`;
+
+  // Indicadores de vez
+  if (estado.vezAtual === 'azul') {
+    DOM.vezAzul.classList.remove('hidden');
+    DOM.vezVermelho.classList.add('hidden');
+    habilitarAlternativas('azul');
+    desabilitarAlternativasEquipe('vermelho');
+  } else {
+    DOM.vezVermelho.classList.remove('hidden');
+    DOM.vezAzul.classList.add('hidden');
+    habilitarAlternativas('vermelho');
+    desabilitarAlternativasEquipe('azul');
+  }
+}
+
+function gerarAlternativas(pergunta, equipe) {
+  const container = equipe === 'azul' ? DOM.altAzul : DOM.altVermelho;
+  container.innerHTML = '';
+
+  pergunta.opcoes.forEach((op, idx) => {
+    const btn = document.createElement('button');
+    btn.className = 'btn-alternativa';
+    btn.dataset.letra = op.letra;
+    btn.innerHTML = `<span class="letra">${String.fromCharCode(65 + idx)}</span>${op.texto}`;
+
+    btn.addEventListener('click', () => responder(op.letra, pergunta, equipe));
+    container.appendChild(btn);
+  });
+}
+
+function habilitarAlternativas(equipe) {
+  const container = equipe === 'azul' ? DOM.altAzul : DOM.altVermelho;
+  container.querySelectorAll('.btn-alternativa').forEach(b => b.disabled = false);
+}
+
+function desabilitarAlternativasEquipe(equipe) {
+  const container = equipe === 'azul' ? DOM.altAzul : DOM.altVermelho;
+  container.querySelectorAll('.btn-alternativa').forEach(b => b.disabled = true);
+}
+
+function desabilitarAlternativas() {
+  DOM.altAzul.querySelectorAll('.btn-alternativa').forEach(b => b.disabled = true);
+  DOM.altVermelho.querySelectorAll('.btn-alternativa').forEach(b => b.disabled = true);
+}
+
+/* ════════════════════════════════════════════════════════════
+   RESPOSTA
+════════════════════════════════════════════════════════════ */
+function responder(letraSelecionada, pergunta, equipeQueTenta) {
+  // Só a equipe da vez pode responder
+  if (equipeQueTenta !== estado.vezAtual) return;
+  if (estado.respondido) return;
+
+  estado.respondido = true;
+  limparCronometro();
+  desabilitarAlternativas();
+
+  const correto = letraSelecionada === pergunta.correta;
+  const avanco  = estado.superGotaAtiva ? 2 : 1;
+
+  // Marca visual das alternativas (ambas colunas)
+  marcarAlternativas('azul', pergunta.correta, correto ? letraSelecionada : null, !correto ? letraSelecionada : null);
+  marcarAlternativas('vermelho', pergunta.correta, correto ? letraSelecionada : null, !correto ? letraSelecionada : null);
+
+  if (correto) {
+    // Acerto: equipe avança
+    if (equipeQueTenta === 'azul') {
+      estado.pontosAzul++;
+    } else {
+      estado.pontosVermelho++;
+    }
+
+    moverCorda(equipeQueTenta, avanco);
+    mostrarFeedback(equipeQueTenta, estado.superGotaAtiva ? `💥 +${avanco} SUPER AVANÇO!` : `✅ +${avanco} Acertou!`, true);
+    animarColuna(equipeQueTenta, 'acerto');
+    dispararParticulas(equipeQueTenta);
+
+  } else {
+    // Erro: adversário avança
+    const adversario = equipeQueTenta === 'azul' ? 'vermelho' : 'azul';
+    moverCorda(adversario, avanco);
+    mostrarFeedback(equipeQueTenta, estado.superGotaAtiva ? `💥 -${avanco} Errou! Adversário avança ${avanco}!` : `❌ Errou! Adversário avança.`, false);
+    animarColuna(equipeQueTenta, 'erro');
+  }
+
+  atualizarPlacar();
+  atualizarBarraProgresso();
+
+  // Verifica vitória
+  if (verificarVitoria()) return;
+
+  // Próxima rodada após delay
+  setTimeout(() => proximaRodada(), 2400);
+}
+
+/** Marca visualmente as alternativas corretas/erradas */
+function marcarAlternativas(equipe, correta, letraAcerto, letraErro) {
+  const container = equipe === 'azul' ? DOM.altAzul : DOM.altVermelho;
+  container.querySelectorAll('.btn-alternativa').forEach(btn => {
+    const letra = btn.dataset.letra;
+    if (letraAcerto && letra === correta)  btn.classList.add('correto');
+    if (letraErro   && letra === letraErro) btn.classList.add('errado');
+  });
+}
+
+function mostrarFeedback(equipe, msg, acerto) {
+  const el = equipe === 'azul' ? DOM.feedbackAzul : DOM.feedbackVermelho;
+  el.textContent = msg;
+  el.style.color = acerto ? '#00FF9F' : '#FF8080';
+}
+
+/* ════════════════════════════════════════════════════════════
+   PLACAR
+════════════════════════════════════════════════════════════ */
+function atualizarPlacar() {
+  DOM.placarAzul.textContent         = estado.pontosAzul;
+  DOM.placarVermelho.textContent     = estado.pontosVermelho;
+  DOM.pontosAzulDisp.textContent     = estado.pontosAzul;
+  DOM.pontosVermDisp.textContent     = estado.pontosVermelho;
+}
+
+/* ════════════════════════════════════════════════════════════
+   ANIMAÇÕES DE COLUNA
+════════════════════════════════════════════════════════════ */
+function animarColuna(equipe, tipo) {
+  const col = equipe === 'azul' ? DOM.colunaAzul : DOM.colunaVermelha;
+  if (tipo === 'acerto') {
+    col.classList.add(equipe === 'azul' ? 'acerto-azul' : 'acerto-vermelho');
+    setTimeout(() => col.classList.remove('acerto-azul','acerto-vermelho'), 1000);
+  } else {
+    col.classList.add('erro-coluna');
+    setTimeout(() => col.classList.remove('erro-coluna'), 600);
+  }
+}
+
+/** Dispara partículas de acerto */
+function dispararParticulas(equipe) {
+  const emojis = equipe === 'azul'
+    ? ['💧','💙','⭐','✨','🌊']
+    : ['💧','❤️','⭐','✨','🔥'];
+
+  for (let i = 0; i < 8; i++) {
+    setTimeout(() => {
+      const el = document.createElement('div');
+      el.className = 'particula';
+      el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+      el.style.left  = Math.random() * window.innerWidth + 'px';
+      el.style.top   = (window.innerHeight * 0.6) + 'px';
+      el.style.animationDuration = (0.8 + Math.random() * 0.7) + 's';
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 1500);
+    }, i * 80);
+  }
+}
+
+/* ════════════════════════════════════════════════════════════
+   PRÓXIMA RODADA
+════════════════════════════════════════════════════════════ */
+function proximaRodada() {
+  // Alterna vez
+  estado.vezAtual = estado.vezAtual === 'azul' ? 'vermelho' : 'azul';
+
+  const prox = proximaPergunta();
+  estado.perguntaAtual = prox;
+
+  if (prox.superGota) {
+    // Mostra modal Super Gota antes da pergunta
+    DOM.modalSuperGota.classList.remove('hidden');
+  } else {
+    renderizarPergunta(prox);
+    iniciarCronometro();
+  }
+}
+
+/* ════════════════════════════════════════════════════════════
+   VERIFICAR VITÓRIA
+   Condição: posição da corda atinge ±LIMITE_VENCER
+════════════════════════════════════════════════════════════ */
+function verificarVitoria() {
+  // Vitória pela posição da corda
+  if (estado.posicaoCorda <= -LIMITE_VENCER) {
+    mostrarVitoria('azul');
+    return true;
+  }
+  if (estado.posicaoCorda >= LIMITE_VENCER) {
+    mostrarVitoria('vermelho');
+    return true;
+  }
+  return false;
+}
+
+/* ════════════════════════════════════════════════════════════
+   TELA DE VITÓRIA
+════════════════════════════════════════════════════════════ */
+function mostrarVitoria(equipe) {
+  limparCronometro();
+  estado.jogoAtivo = false;
+
+  DOM.telaJogo.classList.remove('ativa');
+  DOM.telaJogo.style.display = 'none';
+
+  const nomeEquipe = equipe === 'azul' ? 'Equipe Azul' : 'Equipe Vermelha';
+  const icone      = equipe === 'azul' ? '💧🏆💧' : '🔥🏆🔥';
+
+  DOM.vitoriaTitulo.textContent = `${nomeEquipe} Venceu! ${icone}`;
+  DOM.vitoriaSubtitulo.textContent = 'Parabéns pela sabedoria no uso consciente da água!';
+  DOM.vitAzul.textContent = estado.pontosAzul;
+  DOM.vitVermelho.textContent = estado.pontosVermelho;
+
+  const mensagens = [
+    '💧 Cada gota conta para um futuro sustentável!',
+    '🌊 Água é vida — use com consciência!',
+    '🌱 Preservar a água é preservar o futuro das próximas gerações!',
+    '♻️ O uso consciente da água começa com atitudes simples!',
+    '🌍 Juntos podemos garantir água para todos!',
+  ];
+  DOM.vitoriaMsg.textContent = mensagens[Math.floor(Math.random() * mensagens.length)];
+
+  DOM.telaVitoria.style.display = 'flex';
+  DOM.telaVitoria.classList.add('ativa');
+
+  criarChuvaDeGotas();
+}
+
+/** Animação de gotas caindo na tela de vitória */
+function criarChuvaDeGotas() {
+  DOM.gotasChuva.innerHTML = '';
+  const gotas = ['💧','🌊','💦','❄️','🫧'];
+
+  for (let i = 0; i < 25; i++) {
+    const g = document.createElement('div');
+    g.className = 'gota-chuva';
+    g.textContent = gotas[Math.floor(Math.random() * gotas.length)];
+    g.style.left     = Math.random() * 100 + 'vw';
+    g.style.fontSize = (0.8 + Math.random() * 1.2) + 'rem';
+    g.style.animationDuration  = (3 + Math.random() * 5) + 's';
+    g.style.animationDelay     = (Math.random() * 4) + 's';
+    DOM.gotasChuva.appendChild(g);
+  }
+}
+
+/* ════════════════════════════════════════════════════════════
+   INICIAR / REINICIAR JOGO
+════════════════════════════════════════════════════════════ */
+function iniciarJogo() {
+  // Reset do estado
+  estado.pontosAzul        = 0;
+  estado.pontosVermelho    = 0;
+  estado.posicaoCorda      = 0;
+  estado.vezAtual          = 'azul';
+  estado.contadorRodada    = 0;
+  estado.superGotaAtiva    = false;
+  estado.respondido        = false;
+  estado.jogoAtivo         = true;
+  estado.filaDuperguntas   = embaralhar([...PERGUNTAS_BASE]);
+  estado.filaSuperGota     = embaralhar([...SUPER_GOTA_BASE]);
+  estado.usadasNormais.clear();
+  estado.usadasSuperGota.clear();
+
+  limparCronometro();
+
+  // Troca de telas
+  DOM.telaInicial.classList.remove('ativa');
+  DOM.telaInicial.style.display = 'none';
+  DOM.telaVitoria.classList.remove('ativa');
+  DOM.telaVitoria.style.display = 'none';
+
+  DOM.telaJogo.style.display = 'flex';
+  DOM.telaJogo.classList.add('ativa');
+
+  // Reset visual
+  atualizarPlacar();
+  atualizarBarraProgresso();
+  renderizarCorda();
+  DOM.feedbackAzul.textContent   = '';
+  DOM.feedbackVermelho.textContent = '';
+
+  // Primeira pergunta
+  const primeira = proximaPergunta();
+  estado.perguntaAtual = primeira;
+
+  if (primeira.superGota) {
+    DOM.modalSuperGota.classList.remove('hidden');
+  } else {
+    renderizarPergunta(primeira);
+    iniciarCronometro();
+  }
+}
+
+/* ════════════════════════════════════════════════════════════
+   EVENT LISTENERS
+════════════════════════════════════════════════════════════ */
+
+// Iniciar jogo
+DOM.btnIniciar.addEventListener('click', () => {
+  iniciarJogo();
+});
+
+// Jogar novamente
+DOM.btnJogarNovamente.addEventListener('click', () => {
+  iniciarJogo();
+});
+
+// Modal Super Gota — fechar e mostrar pergunta
+DOM.btnOkSuperGota.addEventListener('click', () => {
+  DOM.modalSuperGota.classList.add('hidden');
+  renderizarPergunta(estado.perguntaAtual);
+  iniciarCronometro();
+});
+
+/* ════════════════════════════════════════════════════════════
+   INIT — Garante que a tela inicial aparece corretamente
+════════════════════════════════════════════════════════════ */
+(function init() {
+  DOM.telaInicial.style.display   = 'flex';
+  DOM.telaJogo.style.display      = 'none';
+  DOM.telaVitoria.style.display   = 'none';
+  DOM.modalSuperGota.classList.add('hidden');
+})();
